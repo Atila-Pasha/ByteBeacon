@@ -4,9 +4,9 @@ from app.core.config import settings
 
 
 app = FastAPI(
-    title=settings.app_name,
+    title=settings.APP_NAME,
     description="Open-source API and uptime monitoring for developers",
-    version=settings.app_version,
+    version=settings.APP_VERSION,
 )
 
 
