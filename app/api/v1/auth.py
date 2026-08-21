@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token
 from app.db.session import get_db
-from app.schemas.auth import TokenResponse
+from app.core.config import settings
+from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.user import UserCreate, UserResponse
 from app.services.auth_service import (
     authenticate_user,
@@ -19,6 +20,7 @@ from app.services.auth_service import (
     revoke_refresh_token,
     rotate_refresh_token,
 )
+
 
 
 router = APIRouter(
@@ -48,21 +50,22 @@ async def register(
             detail=str(exc),
         )
         
-
+        
+        
 @router.post(
     "/login",
     response_model=TokenResponse,
 )
 async def login(
+    login_data: LoginRequest,
     response: Response,
-    username: str,
-    password: str,
     db: AsyncSession = Depends(get_db),
 ):
+
     user = await authenticate_user(
         db=db,
-        username=username,
-        password=password,
+        username=login_data.username,
+        password=login_data.password,
     )
 
     if user is None:
@@ -84,23 +87,21 @@ async def login(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,
+        secure=not settings.DEBUG,
         samesite="lax",
-        max_age=15 * 60,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,
+        secure=not settings.DEBUG,
         samesite="lax",
-        max_age=7 * 24 * 60 * 60,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
     )
 
-    return {
-        "message": "Login successful",
-    }
+    return {"message": "Login successful"}
     
 
 @router.post(
@@ -139,18 +140,18 @@ async def refresh(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,
+        secure=not settings.DEBUG,
         samesite="lax",
-        max_age=15 * 60,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
     response.set_cookie(
         key="refresh_token",
         value=new_refresh_token,
         httponly=True,
-        secure=False,
+        secure=not settings.DEBUG,
         samesite="lax",
-        max_age=7 * 24 * 60 * 60,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
     )
 
     return {
