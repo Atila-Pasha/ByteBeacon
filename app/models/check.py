@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -25,8 +25,8 @@ class Check(Base):
         nullable=True,
     )
 
-    latency: Mapped[int | None] = mapped_column(
-        Integer,
+    latency: Mapped[float | None] = mapped_column(
+        Float,
         nullable=True,
     )
 
