@@ -20,7 +20,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/",
+    "",
     response_model=MonitorResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -37,7 +37,7 @@ async def create_monitor(
 
 
 @router.get(
-    "/",
+    "",
     response_model=list[MonitorResponse],
 )
 async def get_monitors(
