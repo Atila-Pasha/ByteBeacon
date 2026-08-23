@@ -81,3 +81,24 @@ async def test_check_monitor_records_http_failure(monkeypatch):
     assert check.is_success is False
     assert check.error == "connection failed"
     assert session.commits == 1
+
+
+@pytest.mark.asyncio
+async def test_check_monitor_rejects_private_targets(monkeypatch):
+    session = FakeSession()
+    monitor = SimpleNamespace(id=9, url="http://internal.test")
+
+    async def private_dns(*_args, **_kwargs):
+        return [(None, None, None, None, ("127.0.0.1", 80))]
+
+    monkeypatch.setattr(
+        checker.asyncio.get_running_loop(),
+        "getaddrinfo",
+        private_dns,
+    )
+
+    check = await checker.check_monitor(session, monitor)
+
+    assert check.is_success is False
+    assert check.status_code is None
+    assert "public IP addresses" in check.error
