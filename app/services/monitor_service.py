@@ -57,7 +57,10 @@ async def update_monitor(
     monitor: Monitor,
     monitor_data: MonitorUpdate,
 ) -> Monitor:
-    update_data = monitor_data.model_dump(exclude_unset=True)
+    update_data = monitor_data.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+    )
 
     if "url" in update_data and update_data["url"] is not None:
         update_data["url"] = str(update_data["url"])

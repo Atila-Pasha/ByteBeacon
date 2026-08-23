@@ -125,6 +125,8 @@ async def rotate_refresh_token(
     now = datetime.now(timezone.utc)
 
     if refresh_token.expires_at <= now:
+        refresh_token.revoked_at = now
+        await db.commit()
         return None
 
     result = await db.execute(
