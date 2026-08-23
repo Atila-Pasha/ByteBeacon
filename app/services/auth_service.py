@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -46,7 +47,11 @@ async def register_user(
 
     db.add(user)
 
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise ValueError("Email or username already registered") from exc
     await db.refresh(user)
 
     return user
@@ -115,6 +120,7 @@ async def rotate_refresh_token(
             RefreshToken.token_hash == token_hash,
             RefreshToken.revoked_at.is_(None),
         )
+        .with_for_update()
     )
 
     refresh_token = result.scalar_one_or_none()

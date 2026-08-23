@@ -10,6 +10,6 @@ class IncidentResponse(BaseModel):
     reason: str | None
     started_at: datetime
     resolved_at: datetime | None
-    duration: float | None
+    is_resolved: bool
 
     model_config = ConfigDict(from_attributes=True)

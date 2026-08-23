@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
     CHECK_TIMEOUT: float = 10.0
+    SCHEDULER_ENABLED: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env",

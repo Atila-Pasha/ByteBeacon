@@ -12,11 +12,13 @@ from app.monitoring.scheduler import MonitorScheduler
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     scheduler = MonitorScheduler()
-    scheduler.start()
+    if settings.SCHEDULER_ENABLED:
+        scheduler.start()
     try:
         yield
     finally:
-        await scheduler.stop()
+        if settings.SCHEDULER_ENABLED:
+            await scheduler.stop()
         await engine.dispose()
 
 app = FastAPI(
