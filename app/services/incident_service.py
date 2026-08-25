@@ -11,11 +11,7 @@ async def reconcile_incident_for_check(
     db: AsyncSession,
     check: Check,
 ) -> Incident | None:
-    """Open an incident for a failed check or resolve one after recovery.
 
-    This function deliberately does not commit. The caller persists the check
-    and its incident state as one transaction.
-    """
     result = await db.execute(
         select(Incident)
         .where(
@@ -50,3 +46,15 @@ async def reconcile_incident_for_check(
     )
     db.add(incident)
     return incident
+
+
+async def get_monitor_incidents(
+    db: AsyncSession,
+    monitor_id: int,
+) -> list[Incident]:
+    result = await db.execute(
+        select(Incident)
+        .where(Incident.monitor_id == monitor_id)
+        .order_by(Incident.started_at.desc())
+    )
+    return list(result.scalars().all())
