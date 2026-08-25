@@ -11,6 +11,7 @@ from app.models.check import Check
 from app.models.monitor import Monitor
 from app.core.config import settings
 from app.services.incident_service import reconcile_incident_for_check
+from app.services.notification_service import notification_service
 
 
 class UnsafeMonitorTargetError(ValueError):
@@ -85,8 +86,17 @@ async def check_monitor(
     )
 
     db.add(check)
-    await reconcile_incident_for_check(db, check)
+    incident = await reconcile_incident_for_check(db, check)
     await db.commit()
     await db.refresh(check)
+
+    if incident is not None:
+        try:
+            if check.is_success:
+                await notification_service.send_incident_notification(db, incident, "recovery")
+            else:
+                await notification_service.send_incident_notification(db, incident, "down")
+        except Exception:
+            pass
 
     return check

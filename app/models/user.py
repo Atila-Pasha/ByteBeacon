@@ -2,14 +2,16 @@ from datetime import datetime
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, DateTime, func
+from sqlalchemy import BigInteger, String, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.monitor import Monitor
+    from app.models.notification import Notification
     from app.models.refresh_token import RefreshToken
+    from app.models.telegram_connection_token import TelegramConnectionToken
 
 
 class User(Base):
@@ -49,6 +51,13 @@ class User(Base):
         nullable=False,
     )
 
+    telegram_chat_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        nullable=True,
+        unique=True,
+        index=True,
+    )
+
     monitors: Mapped[list["Monitor"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
@@ -68,6 +77,16 @@ class User(Base):
     )
     
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    telegram_connection_tokens: Mapped[list["TelegramConnectionToken"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    notifications: Mapped[list["Notification"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

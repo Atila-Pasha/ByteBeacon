@@ -5,3 +5,4 @@ os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://test:test@localhost/
 os.environ.setdefault("DATABASE_SYNC_URL", "postgresql+psycopg://test:test@localhost/test")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 os.environ["DEBUG"] = "false"
+os.environ["TELEGRAM_BOT_TOKEN"] = ""
