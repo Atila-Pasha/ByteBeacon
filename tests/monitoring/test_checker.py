@@ -21,6 +21,17 @@ class FakeSession:
     async def refresh(self, item) -> None:
         self.refreshed.append(item)
 
+    async def execute(self, _query):
+        return FakeResult(None)
+
+
+class FakeResult:
+    def __init__(self, value) -> None:
+        self.value = value
+
+    def scalar_one_or_none(self):
+        return self.value
+
 
 class ResponseClient:
     def __init__(self, response: httpx.Response | Exception) -> None:

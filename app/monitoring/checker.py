@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.check import Check
 from app.models.monitor import Monitor
 from app.core.config import settings
+from app.services.incident_service import reconcile_incident_for_check
 
 
 class UnsafeMonitorTargetError(ValueError):
@@ -84,6 +85,7 @@ async def check_monitor(
     )
 
     db.add(check)
+    await reconcile_incident_for_check(db, check)
     await db.commit()
     await db.refresh(check)
 
