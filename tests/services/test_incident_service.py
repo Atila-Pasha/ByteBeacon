@@ -43,6 +43,7 @@ async def test_failed_check_opens_an_incident():
     assert incident.status == "open"
     assert incident.is_resolved is False
     assert incident.reason == "HTTP 503"
+    assert isinstance(incident.started_at, datetime)
 
 
 @pytest.mark.asyncio

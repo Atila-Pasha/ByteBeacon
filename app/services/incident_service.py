@@ -43,6 +43,7 @@ async def reconcile_incident_for_check(
         status="open",
         is_resolved=False,
         reason=reason,
+        started_at=datetime.now(timezone.utc),
     )
     db.add(incident)
     return incident
