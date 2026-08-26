@@ -52,11 +52,12 @@ class FakeSession:
 @pytest.mark.asyncio
 async def test_generate_telegram_connection_token_returns_short_lived_token():
     session = FakeSession()
-    token = await create_telegram_connection_token(session, user_id=42)
+    token, expires_at = await create_telegram_connection_token(session, user_id=42)
 
     assert token.startswith("BB-TG-")
     assert len(token) > 12
     assert "BB-TG-" in token
+    assert expires_at > datetime.now(timezone.utc)
     assert session.added
 
 
@@ -138,29 +139,18 @@ async def test_telegram_bot_stop_does_not_stop_a_poller_that_never_started():
 
 
 @pytest.mark.asyncio
-async def test_create_telegram_token_uses_the_newest_record_when_multiple_exist(monkeypatch):
-    newest = SimpleNamespace(expires_at=datetime.now(timezone.utc) + timedelta(minutes=10))
-
-    class ResultWithManyTokens:
-        def scalars(self):
-            return self
-
-        def first(self):
-            return newest
-
-    class TokenDatabase:
-        async def execute(self, _query):
-            return ResultWithManyTokens()
+async def test_create_telegram_token_returns_service_expiry(monkeypatch):
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     async def create_token(_db, _user_id):
-        return "BB-TG-new-token"
+        return "BB-TG-new-token", expires_at
 
     monkeypatch.setattr(users_api, "create_telegram_connection_token", create_token)
 
     response = await users_api.create_telegram_token(
-        db=TokenDatabase(),
+        db=SimpleNamespace(),
         current_user=SimpleNamespace(id=42),
     )
 
     assert response["token"] == "BB-TG-new-token"
-    assert response["expires_at"] == newest.expires_at.isoformat()
+    assert response["expires_at"] == expires_at.isoformat()

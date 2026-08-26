@@ -7,7 +7,6 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.checks import router as check_router
 from app.api.v1.incidents import router as incident_router
 from app.db.session import get_db
-from app.models.telegram_connection_token import TelegramConnectionToken
 from app.services.telegram_service import TelegramConnectionError, connect_telegram_chat
 
 router = APIRouter(

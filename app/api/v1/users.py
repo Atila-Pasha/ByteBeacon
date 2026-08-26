@@ -1,12 +1,8 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_current_user
 from app.db.session import get_db
-from app.models.telegram_connection_token import TelegramConnectionToken
 from app.models.user import User
 from app.schemas.user import UserResponse
 from app.services.telegram_service import (
@@ -41,16 +37,7 @@ async def create_telegram_token(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    token = await create_telegram_connection_token(db, current_user.id)
-    result = await db.execute(
-        select(TelegramConnectionToken)
-        .where(TelegramConnectionToken.user_id == current_user.id)
-        .order_by(TelegramConnectionToken.created_at.desc())
-    )
-    # Users can generate more than one link token. The query is ordered newest
-    # first, so use that record instead of requiring exactly one row.
-    token_record = result.scalars().first()
-    expires_at = token_record.expires_at if token_record is not None else datetime.now(timezone.utc)
+    token, expires_at = await create_telegram_connection_token(db, current_user.id)
     return {
         "token": token,
         "telegram_link": build_telegram_start_link(token),

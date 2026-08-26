@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 
@@ -23,6 +21,5 @@ class MonitorResponse(BaseModel):
     url: HttpUrl
     interval: int
     is_active: bool
-
 
     model_config = ConfigDict(from_attributes=True)

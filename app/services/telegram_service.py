@@ -34,7 +34,7 @@ def hash_telegram_token(token: str) -> str:
 async def create_telegram_connection_token(
     db: AsyncSession,
     user_id: int,
-) -> str:
+) -> tuple[str, datetime]:
     token = generate_telegram_token()
     expires_at = datetime.now(timezone.utc) + timedelta(
         minutes=settings.TELEGRAM_LINK_EXPIRE_MINUTES,
@@ -48,7 +48,7 @@ async def create_telegram_connection_token(
     db.add(token_record)
     await db.commit()
     await db.refresh(token_record)
-    return token
+    return token, expires_at
 
 
 async def connect_telegram_chat(
