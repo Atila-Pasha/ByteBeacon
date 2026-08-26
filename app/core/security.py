@@ -8,7 +8,7 @@ from pwdlib import PasswordHash
 from app.core.config import settings
 
 
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Cookie, Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -73,6 +73,7 @@ def hash_refresh_token(token: str) -> str:
     
     
 async def get_current_user(
+    authorization: str | None = Header(default=None),
     access_token: str | None = Cookie(default=None),
     db: AsyncSession = Depends(get_db),
 ) -> User:
@@ -81,6 +82,17 @@ async def get_current_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Not authenticated",
     )
+
+    if authorization is not None:
+        parts = authorization.split(" ")
+        if (
+            len(parts) != 2
+            or parts[0].lower() != "bearer"
+            or not parts[1]
+        ):
+            raise credentials_exception
+
+        access_token = parts[1]
 
     if access_token is None:
         raise credentials_exception
