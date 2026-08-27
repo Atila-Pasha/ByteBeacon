@@ -72,7 +72,7 @@ IP addresses; private and loopback destinations are rejected.
 ### 1. Clone and enter the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Atila-Pasha/ByteBeacon.git
 cd ByteBeacon
 ```
 
