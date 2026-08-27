@@ -37,22 +37,29 @@ incidents, and can deliver notifications through Telegram.
 ## Architecture
 
 ```text
-										+------------------+
-										|  FastAPI service  |
-										+---------+--------+
-															|
-						 +----------------+----------------+
-						 |                                 |
-			REST API / auth                  Monitor scheduler
-						 |                                 |
-						 +----------------+----------------+
-															|
-										+---------v--------+
-										|    PostgreSQL    |
-										+------------------+
-															|
-										Public HTTP/HTTPS
-											 monitor targets
+                         ┌──────────────────────┐
+                         │     FastAPI API      │
+                         │  REST API · Auth     │
+                         └──────────┬───────────┘
+                                    │
+                         ┌──────────▼───────────┐
+                         │   Monitor Scheduler  │
+                         │  Async Monitoring    │
+                         └──────────┬───────────┘
+                                    │
+                         ┌──────────▼───────────┐
+                         │      PostgreSQL      │
+                         │   Persistent Data    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                    ┌──────────────────────────────┐
+                    │     Public HTTP / HTTPS      │
+                    │       Monitor Targets        │
+                    └──────────────────────────────┘
+
+```
+
 ```
 
 The scheduler reconciles active monitors and runs checks at each monitor's
