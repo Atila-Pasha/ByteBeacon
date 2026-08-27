@@ -60,8 +60,6 @@ incidents, and can deliver notifications through Telegram.
 
 ```
 
-```
-
 The scheduler reconciles active monitors and runs checks at each monitor's
 configured interval. A check is considered successful for HTTP status codes
 from `200` through `399`. Monitor targets must resolve exclusively to public
