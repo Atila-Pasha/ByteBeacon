@@ -22,9 +22,18 @@ class Settings(BaseSettings):
     TELEGRAM_LINK_EXPIRE_MINUTES: int = 10
     TELEGRAM_API_TIMEOUT: float = 10.0
     TELEGRAM_API_BASE_URL: str = "http://localhost:8000"
-    # Set this when Telegram is only reachable through a proxy, e.g.
-    # socks5://127.0.0.1:10808.
+
     TELEGRAM_PROXY_URL: str = ""
+
+
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""
+    SMTP_FROM_NAME: str = "ByteBeacon"
+    SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

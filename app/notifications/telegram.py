@@ -18,12 +18,13 @@ class TelegramNotificationProvider(NotificationProvider):
             proxy=settings.TELEGRAM_PROXY_URL or None,
         )
 
-    async def send(self, *, chat_id: int, text: str) -> None:
+    async def send(self, *, recipient: str, text: str) -> None:
         if not self.api_token:
             logger.warning("Telegram bot token is not configured; skipping notification")
             return
 
         try:
+            chat_id = int(recipient)
             response = await self.client.post(
                 f"/bot{self.api_token}/sendMessage",
                 json={
@@ -34,6 +35,9 @@ class TelegramNotificationProvider(NotificationProvider):
                 },
             )
             response.raise_for_status()
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid Telegram chat_id: {recipient}")
+            raise
         except httpx.HTTPError:
             logger.exception("Telegram notification delivery failed")
             raise
