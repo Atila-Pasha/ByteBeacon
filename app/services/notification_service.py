@@ -89,11 +89,11 @@ class NotificationService:
 
         if event_type == "down":
             text = (
-                "<b>🔴 Monitor Down</b><br><br>"
-                f"Monitor: {monitor.name}<br>"
-                f"URL: {monitor.url}<br>"
-                f"Reason: {incident.reason or 'Unknown'}<br>"
-                f"Time: {datetime.now(timezone.utc).strftime('%H:%M UTC')}"
+                "<b>🔴 Monitor Down</b>\n\n"
+                f"<b>Monitor:</b> {monitor.name}\n"
+                f"<b>URL:</b> {monitor.url}\n"
+                f"<b>Reason:</b> {incident.reason or 'Unknown'}\n"
+                f"<b>Time:</b> {datetime.now(timezone.utc).strftime('%H:%M UTC')}"
             )
         elif event_type == "recovery":
             if incident.resolved_at is not None and incident.started_at is not None:
@@ -105,11 +105,11 @@ class NotificationService:
             else:
                 duration_text = "unknown"
             text = (
-                "<b>🟢 Monitor Recovered</b><br><br>"
-                f"Monitor: {monitor.name}<br>"
-                f"URL: {monitor.url}<br>"
-                f"Recovered: {datetime.now(timezone.utc).strftime('%H:%M UTC')}<br>"
-                f"Duration: {duration_text}"
+                "<b>🟢 Monitor Recovered</b>\n\n"
+                f"<b>Monitor:</b> {monitor.name}\n"
+                f"<b>URL:</b> {monitor.url}\n"
+                f"<b>Recovered:</b> {datetime.now(timezone.utc).strftime('%H:%M UTC')}\n"
+                f"<b>Duration:</b> {duration_text}"
             )
         else:
             return None

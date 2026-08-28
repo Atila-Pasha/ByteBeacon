@@ -141,7 +141,7 @@ class TestEmailNotificationProvider:
 
     @pytest.mark.asyncio
     async def test_send_email_html_content(self):
-        """Test that HTML content is included."""
+
         provider = EmailNotificationProvider(
             smtp_host="smtp.gmail.com",
             smtp_port=587,
@@ -166,12 +166,12 @@ class TestEmailNotificationProvider:
 
             sent_msg = mock_server.send_message.call_args[0][0]
 
-            # Verify the message has HTML parts and was sent with correct structure
+
             assert sent_msg["Subject"] == "ByteBeacon Alert"
             assert sent_msg["To"] == "user@example.com"
             assert sent_msg.is_multipart()
             
-            # Check that HTML part exists
+   
             found_html = False
             for part in sent_msg.walk():
                 if part.get_content_type() == "text/html":
@@ -354,7 +354,7 @@ class TestEmailNotificationProvider:
                     text="<b>Test</b>",
                 )
 
-            # Verify context manager's __exit__ was called (connection cleanup)
+
             mock_context.__exit__.assert_called_once()
 
     @pytest.mark.asyncio

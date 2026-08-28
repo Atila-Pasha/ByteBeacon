@@ -25,6 +25,17 @@ class TelegramNotificationProvider(NotificationProvider):
 
         try:
             chat_id = int(recipient)
+        except (ValueError, TypeError):
+            logger.error(f"Invalid Telegram chat_id: {recipient}")
+            raise
+
+        try:
+
+            logger.debug(
+                f"Sending Telegram notification to chat_id: {chat_id}, "
+                f"text length: {len(text)}"
+            )
+
             response = await self.client.post(
                 f"/bot{self.api_token}/sendMessage",
                 json={
@@ -34,12 +45,21 @@ class TelegramNotificationProvider(NotificationProvider):
                     "disable_web_page_preview": True,
                 },
             )
+
+
+            logger.debug(f"Telegram API response status: {response.status_code}")
+
+   
+            if response.status_code >= 400:
+                logger.error(
+                    f"Telegram API error {response.status_code}: {response.text}"
+                )
+
             response.raise_for_status()
-        except (ValueError, TypeError) as e:
-            logger.error(f"Invalid Telegram chat_id: {recipient}")
-            raise
-        except httpx.HTTPError:
-            logger.exception("Telegram notification delivery failed")
+            logger.debug("Telegram notification sent successfully")
+
+        except httpx.HTTPError as e:
+            logger.exception(f"Telegram notification delivery failed: {e}")
             raise
 
     async def close(self) -> None:
